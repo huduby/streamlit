@@ -6,7 +6,7 @@ import plotly.express as px
 
 def main():
     st.title("Plotting In streamlit with plotly")
-    df = pd.read_csv("data\prog_languages_data.csv")
+    df = pd.read_csv("prog_languages_data.csv")
     st.dataframe(df)
     
     fig1 = px.pie(df.head(10),values="Sum",names="lang",title="프로그래밍 언어에 대한 Pie 그래프")
