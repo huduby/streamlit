@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 @st.cache_data
 def data_load():
     # 전체 데이터 1번 가져오기
-    df_k = pd.read_csv("data\국내성씨별인구수데이터_수업용_정제.csv")
-    df_e = pd.read_csv("data\미국lastname_상위100_수업용_정제.csv")
+    df_k = pd.read_csv("국내성씨별인구수데이터_수업용_정제.csv")
+    df_e = pd.read_csv("미국lastname_상위100_수업용_정제.csv")
     df_e = df_e.sort_values(by="인구수",ascending=True).tail(10)
     # 우리나라 성씨 랭킹 업데이트
     df_k["랭킹"] = df_k["인구수"].rank(method="min",ascending=False).astype(int)
