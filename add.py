@@ -8,52 +8,84 @@ import matplotlib.pyplot as plt
 
 # pip install koreanize-matplotlib ( conda install 로는 찾을 수 없음 )
 
+@st.cache_data
+def data_load():
+    # 전체 데이터 1번 가져오기
+    df_k = pd.read_csv("data\국내성씨별인구수데이터_수업용_정제.csv")
+    df_e = pd.read_csv("data\미국lastname_상위100_수업용_정제.csv")
+    df_e = df_e.sort_values(by="인구수",ascending=True).tail(10)
+    # 우리나라 성씨 랭킹 업데이트
+    df_k["랭킹"] = df_k["인구수"].rank(method="min",ascending=False).astype(int)
+    return df_k,df_e
+
+# 웹 페이지 넓게 쓰기
 st.set_page_config(layout="wide")
+# 컬럼으로 나눠서 중간 컨텐츠 부분 사용하기
 empty1,content,empty2 = st.columns([0.5,8.0,1.5])
 
 def main():
+    # 데이터 가져오기
+    df_k,df_e = data_load()
     with empty1:
         pass
     with content:
-        st.title("부모님! 제 용돈을 올려야 합니다.")
-        txt = """학교가 끝나고 학교 앞 문방구나 가게에서 사 먹는 간식.
-맛도 달콤하고 나의 하루를 달콤하게 해주는데요..\n
-이런 간식을 사 먹기 위해 우리는 용돈이 필요해요. 
-간혹 용돈이 부족하다고 느껴질 때가 있나요?\n
-하지만 부모님께 무턱대고 용돈을 올려달라고 말씀드렸다가는 퇴짜 맞기 쉽상이죠.\n
-어떻게 하면 부모님을 설득하여 나의 용돈을 올릴 수 있을까요? """
-        st.info(txt)        
-        tab1,tab2 = st.tabs(["📋 데이터","📊 연도별 검색"])        
+        # 타이틀
+        st.title("야!!! 너두 Smith??")
+        txt = """도심 길거리에서 “김씨“ 를 부른다면 과연 몇 명이나 돌아볼까?
+우리나라의 김씨만큼 미국에는 Smith씨가 많다고 한다.\n
+우리나라와 미국의 성씨 데이터를 살펴보고 다양한 시각화를 통해서 그 말이 사실인지 알아보자. """
+        st.info(txt)
+        
+        # 탭 만들기
+        tab1,tab2,tab3 = st.tabs(["📊 우리나라 성씨 그래프","🔎 우리나라 성씨 랭킹 찾아보기","📊 미국 성씨 그래프"])        
+        
         with tab1:
-            df = pd.read_csv("소비자물가지수_정제.csv",index_col="Unnamed: 0")
-            st.subheader("년도별 간식 물가지수(2020년 100기준)")
-            st.dataframe(df)
-        with tab2:
-            st.subheader("간식 종류별 물가지수 그래프")
+            st.success("""
+                우리나라 성씨 데이터 시각화를 통해서 김(金)씨가 가장 많은 인구수를 차지한다는
+                것을 알 수 있었다.    
+                       """)                
             col1,col2 = st.columns([3,7],gap="medium")
-            with col1:
-                my_food = df.columns.to_list()
-                choice = st.multiselect("",
-                                        my_food,
-                                        placeholder="==간식종류==")
-            
+            with col1:                
+                # 데이터 보여주기        
+                st.subheader("우리나라 성씨 살펴보기")
+                st.dataframe(df_k[["성씨","인구수"]].head(13))
             with col2:
-                if len(choice):
-                    df_1 = df[choice]
-                    # st.dataframe(df_1)
-                    x_label = np.arange(2003,2024)
-                    fig = plt.figure(figsize=(15,8))
-                    plt.rc("font",size=20)
-                    for i in choice:
-                        plt.plot(x_label,df_1[i],label=i,marker="o")
-                    plt.xticks(x_label)
-                    plt.title("내가 좋아하는 간식 물가지수",fontdict={"size":30})
-                    plt.xticks(rotation=30)
-                    plt.xlabel("연도")
-                    plt.ylabel("물가지수")
-                    plt.legend()
-                    plt.grid()            
-                    st.pyplot(fig)
+                # 성씨 TOP 10 랭킹 보여주기
+                df_n = df_k.sort_values(by="인구수",ascending=False).head(10)
+                fig = plt.figure(figsize=(7,5))
+                plt.bar(df_n["성씨"],df_n["인구수"],color=["m","b","r","c"])
+                plt.title("우리나라 성씨 TOP 10")
+                plt.xlabel("성씨")
+                plt.ylabel("인구수")
+                plt.show()
+                st.pyplot(fig)
+              
+        with tab2:
+            # 성씨 랭킹 찾아보기
+            st.subheader("내 성씨는 몇 등? ")
+            first_name = st.text_input(label="어떤 성씨를 찾아볼까?",max_chars=6)            
+            query = df_k[["성씨","인구수","랭킹"]].sort_values(by="인구수",ascending=False)
+            if first_name != "":
+                query = df_k[df_k["성씨"].str.contains(first_name)][["성씨","인구수","랭킹"]].sort_values(by="인구수",ascending=False)
+            st.dataframe(query)
+        with tab3:
+            st.success("""
+                미국 성씨 데이터 시각화를 통해서 SMITH 씨가 가장 많은 인구수를 차지한다는
+                것을 알 수 있었다.    
+                       """)                  
+            col3,col4 = st.columns([3,7],gap="medium")
+            with col3:              
+                st.subheader("미국 성씨 살펴보기")
+                st.dataframe(df_e)
+            with col4:
+                # 미국 성씨 TOP 10 그래프 그리기
+                fig = plt.figure(figsize=(6,4))
+                plt.barh(df_e["성씨"],df_e["인구수"],color=["m","b","r","c"])
+                plt.title("미국 성씨 TOP 10")
+                plt.xlabel("성씨")
+                plt.ylabel("인구수")
+                plt.show()
+                st.pyplot(fig)
     with empty2:
         pass
 if __name__ == "__main__":
