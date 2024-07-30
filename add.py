@@ -1,19 +1,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-# import plotly.express as px
 import koreanize_matplotlib
 import matplotlib.pyplot as plt
-# import plotly.graph_objects as go
 
-# pip install koreanize-matplotlib ( conda install 로는 찾을 수 없음 )
 
 @st.cache_data
 def data_load():
     # 전체 데이터 1번 가져오기
     df_k = pd.read_csv("국내성씨별인구수데이터_수업용_정제.csv")
     df_e = pd.read_csv("미국lastname_상위100_수업용_정제.csv")
-    df_e = df_e.sort_values(by="인구수",ascending=True).tail(10)
+    df_e = df_e.sort_values(by="인구수",ascending=True)
     # 우리나라 성씨 랭킹 업데이트
     df_k["랭킹"] = df_k["인구수"].rank(method="min",ascending=False).astype(int)
     return df_k,df_e
@@ -48,7 +45,7 @@ def main():
             with col1:                
                 # 데이터 보여주기        
                 st.subheader("우리나라 성씨 살펴보기")
-                st.dataframe(df_k[["성씨","인구수"]].head(13))
+                st.dataframe(df_k[["성씨","인구수"]])
             with col2:
                 # 성씨 TOP 10 랭킹 보여주기
                 df_n = df_k.sort_values(by="인구수",ascending=False).head(10)
@@ -58,8 +55,7 @@ def main():
                 plt.xlabel("성씨")
                 plt.ylabel("인구수")
                 plt.show()
-                st.pyplot(fig)
-              
+                st.pyplot(fig)              
         with tab2:
             # 성씨 랭킹 찾아보기
             st.subheader("내 성씨는 몇 등? ")
@@ -80,7 +76,8 @@ def main():
             with col4:
                 # 미국 성씨 TOP 10 그래프 그리기
                 fig = plt.figure(figsize=(6,4))
-                plt.barh(df_e["성씨"],df_e["인구수"],color=["m","b","r","c"])
+                df_g = df_e.tail(10)
+                plt.barh(df_g["성씨"],df_g["인구수"],color=["m","b","r","c"])
                 plt.title("미국 성씨 TOP 10")
                 plt.xlabel("성씨")
                 plt.ylabel("인구수")
@@ -89,8 +86,4 @@ def main():
     with empty2:
         pass
 if __name__ == "__main__":
-
     main()
-
-
-
