@@ -18,7 +18,7 @@ def main():
     tab1,tab2 = st.tabs(["📋 데이터","📊 연도별 검색"])
     
     with tab1:
-        df = pd.read_csv("data\소비자물가지수_정제.csv",index_col="Unnamed: 0")
+        df = pd.read_csv("소비자물가지수_정제.csv",index_col="Unnamed: 0")
         st.subheader("년도별 간식 물가지수(2020년 100기준)")
         st.dataframe(df)
     with tab2:
