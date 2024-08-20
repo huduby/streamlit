@@ -1,6 +1,4 @@
-# ngrok 토큰
-from pyngrok import ngrok
-ngrok.set_auth_token("2I9eymJReA4YArX1gkRYJt2OkOh_5SxX1swXBBK67xgXFETJ7")
+
 
 import streamlit as st
 import tensorflow as tf
